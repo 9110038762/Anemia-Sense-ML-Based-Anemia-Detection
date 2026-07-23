@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anemia Sense — ML-Based Anemia Detection & Diagnostics</title>
+    <meta name="description" content="Anemia Sense is a clinical-grade machine learning application designed to screen and classify anemia from hematological parameters (CBC report).">
+    
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for medical & UI icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-droplet brand-icon"></i>
+                <div class="brand-text">
+                    <h1>Anemia Sense</h1>
+                    <span>Clinical Hub</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <button class="nav-item active" data-tab="dashboard-tab" id="nav-dashboard">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-tab="single-test-tab" id="nav-single-test">
+                    <i class="fa-solid fa-microscope"></i>
+                    <span>Patient Diagnosis</span>
+                </button>
+                <button class="nav-item" data-tab="bulk-test-tab" id="nav-bulk-test">
+                    <i class="fa-solid fa-file-medical"></i>
+                    <span>Bulk Screening</span>
+                </button>
+                <button class="nav-item" data-tab="reference-tab" id="nav-reference">
+                    <i class="fa-solid fa-book-medical"></i>
+                    <span>Clinical Guide</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="model-status-card">
+                    <div class="status-indicator online"></div>
+                    <div class="status-info">
+                        <p class="status-label">ML Model Status</p>
+                        <p class="model-name" id="active-model-name">Loading model...</p>
+                    </div>
+                </div>
+                <div class="author-info">
+                    <p>© 2026 Smart Bridge ML</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="header-title">
+                    <h2 id="current-tab-title">Diagnostic Dashboard</h2>
+                    <p id="current-tab-desc">Overview of ML model health, dataset demographics, and key diagnostics parameters.</p>
+                </div>
+                <div class="header-actions">
+                    <div class="date-badge">
+                        <i class="fa-regular fa-calendar-days"></i>
+                        <span id="current-date">July 23, 2026</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB 1: DASHBOARD -->
+            <section id="dashboard-tab" class="tab-content active">
+                <!-- Summary Metrics Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card glass">
+                        <div class="card-icon blue"><i class="fa-solid fa-users"></i></div>
+                        <div class="card-details">
+                            <h3>Total Samples</h3>
+                            <p class="metric-value" id="stats-total-samples">-</p>
+                            <span class="metric-trend"><i class="fa-solid fa-check"></i> Balanced Dataset</span>
+                        </div>
+                    </div>
+                    <div class="metric-card glass">
+                        <div class="card-icon red"><i class="fa-solid fa-virus"></i></div>
+                        <div class="card-details">
+                            <h3>Anemic Cases</h3>
+                            <p class="metric-value" id="stats-anemic-cases">-</p>
+                            <span class="metric-trend" id="stats-anemic-percent">-</span>
+                        </div>
+                    </div>
+                    <div class="metric-card glass">
+                        <div class="card-icon green"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div class="card-details">
+                            <h3>Healthy Cases</h3>
+                            <p class="metric-value" id="stats-healthy-cases">-</p>
+                            <span class="metric-trend" id="stats-healthy-percent">-</span>
+                        </div>
+                    </div>
+                    <div class="metric-card glass">
+                        <div class="card-icon gold"><i class="fa-solid fa-bullseye"></i></div>
+                        <div class="card-details">
+                            <h3>Model Accuracy</h3>
+                            <p class="metric-value" id="stats-model-accuracy">-</p>
+                            <span class="metric-trend" id="stats-model-f1">F1 Score: -</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Plots / Charts -->
+                <div class="dashboard-row">
+                    <!-- Feature Importance & Model Comparison -->
+                    <div class="dashboard-col-7 glass">
+                        <div class="col-header">
+                            <h3><i class="fa-solid fa-chart-simple"></i> Model Comparison & Feature Contribution</h3>
+                            <p>Performance comparison of multiple algorithms and the diagnostic weight of each parameter.</p>
+                        </div>
+                        
+                        <div class="tab-container">
+                            <div class="tab-headers">
+                                <button class="sub-tab active" data-sub="comparison-content">Algorithm Comparison</button>
+                                <button class="sub-tab" data-sub="importance-content">Feature Weights</button>
+                            </div>
+                            
+                            <div class="sub-tab-content active" id="comparison-content">
+                                <div class="table-container">
+                                    <table class="clinical-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Algorithm</th>
+                                                <th>Accuracy</th>
+                                                <th>Precision</th>
+                                                <th>Recall</th>
+                                                <th>F1-Score</th>
+                                                <th>AUC</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="model-comparison-table-body">
+                                            <tr>
+                                                <td colspan="6" class="text-center">Loading model comparison data...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="sub-tab-content" id="importance-content">
+                                <div class="features-importance-list" id="features-importance-container">
+                                    <!-- Dynamic content -->
+                                    <div class="loading-placeholder">Loading feature importances...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model Confusion Matrix / Stats -->
+                    <div class="dashboard-col-5 glass">
+                        <div class="col-header">
+                            <h3><i class="fa-solid fa-calculator"></i> Confusion Matrix</h3>
+                            <p>Validation results on unseen patient profiles.</p>
+                        </div>
+                        <div class="confusion-matrix-wrapper">
+                            <div class="cm-grid">
+                                <div class="cm-label-y">Actual Class</div>
+                                <div class="cm-matrix">
+                                    <div class="cm-header-x">Predicted Healthy</div>
+                                    <div class="cm-header-x">Predicted Anemic</div>
+                                    
+                                    <div class="cm-row-label">Healthy</div>
+                                    <div class="cm-cell tn" id="cm-tn">
+                                        <span class="cm-value">-</span>
+                                        <span class="cm-desc">True Negative (TN)</span>
+                                    </div>
+                                    <div class="cm-cell fp" id="cm-fp">
+                                        <span class="cm-value">-</span>
+                                        <span class="cm-desc">False Positive (FP)</span>
+                                    </div>
+                                    
+                                    <div class="cm-row-label">Anemic</div>
+                                    <div class="cm-cell fn" id="cm-fn">
+                                        <span class="cm-value">-</span>
+                                        <span class="cm-desc">False Negative (FN)</span>
+                                    </div>
+                                    <div class="cm-cell tp" id="cm-tp">
+                                        <span class="cm-value">-</span>
+                                        <span class="cm-desc">True Positive (TP)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="confusion-summary">
+                            <p id="cm-insights-text">Evaluating performance metrics...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-row">
+                    <!-- ROC Curve visualization -->
+                    <div class="dashboard-col-12 glass">
+                        <div class="col-header">
+                            <h3><i class="fa-solid fa-chart-area"></i> Receiver Operating Characteristic (ROC) Curve</h3>
+                            <p>Visualizing model trade-off between Sensitivity (Recall) and Specificity (1 - False Positive Rate).</p>
+                        </div>
+                        <div class="roc-curve-container">
+                            <div class="roc-chart-wrapper">
+                                <svg id="roc-svg" viewBox="0 0 500 500" class="roc-svg">
+                                    <!-- Grid lines -->
+                                    <line x1="50" y1="50" x2="450" y2="50" stroke="#334155" stroke-dasharray="3,3" />
+                                    <line x1="50" y1="150" x2="450" y2="150" stroke="#334155" stroke-dasharray="3,3" />
+                                    <line x1="50" y1="250" x2="450" y2="250" stroke="#334155" stroke-dasharray="3,3" />
+                                    <line x1="50" y1="350" x2="450" y2="350" stroke="#334155" stroke-dasharray="3,3" />
+                                    
+                                    <line x1="150" y1="50" x2="150" y2="450" stroke="#334155" stroke-dasharray="3,3" />
+                                    <line x1="250" y1="50" x2="250" y2="450" stroke="#334155" stroke-dasharray="3,3" />
+                                    <line x1="350" y1="50" x2="350" y2="450" stroke="#334155" stroke-dasharray="3,3" />
+                                    
+                                    <!-- Axes -->
+                                    <line x1="50" y1="450" x2="450" y2="450" stroke="#64748b" stroke-width="2" />
+                                    <line x1="50" y1="50" x2="50" y2="450" stroke="#64748b" stroke-width="2" />
+                                    
+                                    <!-- Random baseline (diagonal) -->
+                                    <line x1="50" y1="450" x2="450" y2="50" stroke="#475569" stroke-dasharray="5,5" stroke-width="1.5" />
+                                    
+                                    <!-- Dynamic ROC path will be drawn here -->
+                                    <path id="roc-path" d="M 50 450 L 50 450" fill="none" stroke="#06b6d4" stroke-width="3" />
+                                    
+                                    <!-- Axes labels -->
+                                    <text x="250" y="485" class="roc-axis-label" text-anchor="middle">False Positive Rate (1 - Specificity)</text>
+                                    <text x="15" y="250" class="roc-axis-label vertical-text" text-anchor="middle">True Positive Rate (Sensitivity)</text>
+                                    
+                                    <!-- Axes values -->
+                                    <text x="50" y="468" class="roc-tick-label" text-anchor="middle">0.0</text>
+                                    <text x="150" y="468" class="roc-tick-label" text-anchor="middle">0.25</text>
+                                    <text x="250" y="468" class="roc-tick-label" text-anchor="middle">0.5</text>
+                                    <text x="350" y="468" class="roc-tick-label" text-anchor="middle">0.75</text>
+                                    <text x="450" y="468" class="roc-tick-label" text-anchor="middle">1.0</text>
+                                    
+                                    <text x="42" y="454" class="roc-tick-label" text-anchor="end">0.0</text>
+                                    <text x="42" y="354" class="roc-tick-label" text-anchor="end">0.25</text>
+                                    <text x="42" y="254" class="roc-tick-label" text-anchor="end">0.5</text>
+                                    <text x="42" y="154" class="roc-tick-label" text-anchor="end">0.75</text>
+                                    <text x="42" y="54" class="roc-tick-label" text-anchor="end">1.0</text>
+                                </svg>
+                                
+                                <div class="roc-legend">
+                                    <div class="legend-item">
+                                        <span class="legend-color cyan"></span>
+                                        <span class="legend-text" id="roc-auc-label">ML Classifier (AUC: -)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color dashed"></span>
+                                        <span class="legend-text">Random Guess (AUC: 0.50)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-row">
+                    <!-- Recent Screenings Database -->
+                    <div class="dashboard-col-12 glass">
+                        <div class="col-header">
+                            <h3><i class="fa-solid fa-database"></i> Recent Patient Screenings</h3>
+                            <p>History of diagnostic screenings conducted on this terminal. Updates in real-time.</p>
+                        </div>
+                        <div class="table-container">
+                            <table class="clinical-table">
+                                <thead>
+                                    <tr>
+                                        <th>Patient ID</th>
+                                        <th>Timestamp</th>
+                                        <th>Demographics</th>
+                                        <th>Hemoglobin</th>
+                                        <th>MCV (fL)</th>
+                                        <th>Diagnosis Result</th>
+                                        <th>Risk Level</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-screenings-table-body">
+                                    <!-- Dynamic rows loaded from localStorage/defaults -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: SINGLE PATIENT DIAGNOSIS -->
+            <section id="single-test-tab" class="tab-content">
+                <div class="test-layout">
+                    <!-- Parameter Controls Form -->
+                    <div class="test-form-panel glass">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-sliders"></i> Hematology Inputs</h3>
+                            <p>Adjust clinical blood test parameters from the Complete Blood Count (CBC) report.</p>
+                        </div>
+                        
+                        <form id="single-predict-form" class="clinical-form">
+                            <!-- Demographics -->
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="gender">Patient Gender</label>
+                                    <select id="gender" required>
+                                        <option value="0">Female</option>
+                                        <option value="1">Male</option>
+                                    </select>
+                                    <span class="input-hint">Influences Hemoglobin, HCT, and RBC normal ranges.</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="age">Patient Age</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" id="age" min="1" max="120" value="35" required>
+                                        <span class="unit">years</span>
+                                    </div>
+                                    <span class="input-hint">Range: 1 - 120</span>
+                                </div>
+                            </div>
+
+                            <!-- CBC Sliders -->
+                            <div class="sliders-section">
+                                <h4 class="section-title">Red Blood Cell Biomarkers</h4>
+                                
+                                <!-- Hemoglobin -->
+                                <div class="slider-group">
+                                    <div class="slider-header">
+                                        <label for="hemoglobin">Hemoglobin (Hb)</label>
+                                        <div class="slider-value-badge">
+                                            <span class="badge-value" id="val-hemoglobin">14.0</span>
+                                            <span class="badge-unit">g/dL</span>
+                                        </div>
+                                    </div>
+                                    <input type="range" id="hemoglobin" min="4.0" max="20.0" step="0.1" value="14.0" class="cbc-slider">
+                                    <div class="slider-ranges-labels">
+                                        <span>4.0 (Severe)</span>
+                                        <span class="status-marker normal" id="lbl-status-hemoglobin">Normal</span>
+                                        <span>20.0 (High)</span>
+                                    </div>
+                                </div>
+
+                                <!-- RBC Count -->
+                                <div class="slider-group">
+                                    <div class="slider-header">
+                                        <label for="rbc_count">Red Blood Cell (RBC) Count</label>
+                                        <div class="slider-value-badge">
+                                            <span class="badge-value" id="val-rbc_count">4.8</span>
+                                            <span class="badge-unit">M/µL</span>
+                                        </div>
+                                    </div>
+                                    <input type="range" id="rbc_count" min="1.5" max="8.0" step="0.05" value="4.8" class="cbc-slider">
+                                    <div class="slider-ranges-labels">
+                                        <span>1.5 (Low)</span>
+                                        <span class="status-marker normal" id="lbl-status-rbc_count">Normal</span>
+                                        <span>8.0 (High)</span>
+                                    </div>
+                                </div>
+
+                                <!-- Hematocrit -->
+                                <div class="slider-group">
+                                    <div class="slider-header">
+                                        <label for="hematocrit">Hematocrit (HCT)</label>
+                                        <div class="slider-value-badge">
+                                            <span class="badge-value" id="val-hematocrit">42.0</span>
+                                            <span class="badge-unit">%</span>
+                                        </div>
+                                    </div>
+                                    <input type="range" id="hematocrit" min="15.0" max="65.0" step="0.5" value="42.0" class="cbc-slider">
+                                    <div class="slider-ranges-labels">
+                                        <span>15%</span>
+                                        <span class="status-marker normal" id="lbl-status-hematocrit">Normal</span>
+                                        <span>65%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="sliders-section">
+                                <h4 class="section-title">Wintrobe's RBC Indices (Anemia Classification)</h4>
+                                
+                                <!-- MCV -->
+                                <div class="slider-group">
+                                    <div class="slider-header">
+                                        <div class="label-info">
+                                            <label for="mcv">Mean Corpuscular Volume (MCV)</label>
+                                            <i class="fa-solid fa-circle-info info-tooltip" title="Average volume/size of a single red blood cell. Essential for categorizing anemia size."></i>
+                                        </div>
+                                        <div class="slider-value-badge">
+                                            <span class="badge-value" id="val-mcv">90.0</span>
+                                            <span class="badge-unit">fL</span>
+                                        </div>
+                                    </div>
+                                    <input type="range" id="mcv" min="45.0" max="135.0" step="0.5" value="90.0" class="cbc-slider">
+                                    <div class="slider-ranges-labels">
+                                        <span>Microcytic (< 80)</span>
+                                        <span class="status-marker normal" id="lbl-status-mcv">Normocytic</span>
+                                        <span>Macrocytic (> 100)</span>
+                                    </div>
+                                </div>
+
+                                <!-- MCH -->
+                                <div class="slider-group">
+                                    <div class="slider-header">
+                                        <label for="mch">Mean Corpuscular Hemoglobin (MCH)</label>
+                                        <div class="slider-value-badge">
+                                            <span class="badge-value" id="val-mch">30.0</span>
+                                            <span class="badge-unit">pg</span>
+                                        </div>
+                                    </div>
+                                    <input type="range" id="mch" min="12.0" max="45.0" step="0.5" value="30.0" class="cbc-slider">
+                                    <div class="slider-ranges-labels">
+                                        <span>Low (< 27)</span>
+                                        <span class="status-marker normal" id="lbl-status-mch">Normal</span>
+                                        <span>High (> 33)</span>
+                                    </div>
+                                </div>
+
+                                <!-- MCHC -->
+                                <div class="slider-group">
+                                    <div class="slider-header">
+                                        <label for="mchc">MCHC (Hb concentration per cell)</label>
+                                        <div class="slider-value-badge">
+                                            <span class="badge-value" id="val-mchc">34.0</span>
+                                            <span class="badge-unit">g/dL</span>
+                                        </div>
+                                    </div>
+                                    <input type="range" id="mchc" min="22.0" max="40.0" step="0.2" value="34.0" class="cbc-slider">
+                                    <div class="slider-ranges-labels">
+                                        <span>Hypochromic (< 32)</span>
+                                        <span class="status-marker normal" id="lbl-status-mchc">Normochromic</span>
+                                        <span>Hyperchromic (> 36)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="action-btn primary-btn btn-full" id="btn-diagnose">
+                                <i class="fa-solid fa-stethoscope"></i> Analyze Hematological Profile
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Diagnosis Results Display -->
+                    <div class="test-results-panel">
+                        <!-- Initial state -->
+                        <div id="results-placeholder" class="glass full-height flex-center flex-column">
+                            <i class="fa-solid fa-shield-pulse pulse-icon"></i>
+                            <h3>Awaiting Diagnostics</h3>
+                            <p>Adjust clinical parameters on the left and click 'Analyze Hematological Profile' to check for anemia risk.</p>
+                        </div>
+                        
+                        <!-- Diagnosis Output -->
+                        <div id="results-output" class="full-height hidden">
+                            <!-- Main Report Card -->
+                            <div class="report-card glass" id="report-risk-card">
+                                <div class="report-header">
+                                    <div class="report-title-section">
+                                        <span class="report-subtitle">Clinical Screening Report</span>
+                                        <h3 id="report-classification">Normal Hematological Profile</h3>
+                                    </div>
+                                    <div class="risk-badge" id="report-risk-badge">Low Risk</div>
+                                </div>
+                                
+                                <div class="patient-chart-header">
+                                    <div><strong>Patient ID:</strong> <span id="report-patient-id">-</span></div>
+                                    <div><strong>Sex:</strong> <span id="report-patient-sex">-</span></div>
+                                    <div><strong>Age:</strong> <span id="report-patient-age">-</span></div>
+                                    <div><strong>Date:</strong> <span id="report-patient-date">-</span></div>
+                                </div>
+                                
+                                <div class="diagnostic-prob-meter">
+                                    <div class="meter-header">
+                                        <span>Anemia Probability (ML Confidence)</span>
+                                        <span class="meter-val" id="report-prob-value">0%</span>
+                                    </div>
+                                    <div class="meter-bar-container">
+                                        <div class="meter-bar-fill" id="report-prob-fill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="clinical-findings-box">
+                                    <h5>Clinical Findings & Diagnostic Notes</h5>
+                                    <p id="report-clinical-notes">-</p>
+                                </div>
+                            </div>
+
+                            <!-- Value Comparators (reference ranges cards) -->
+                            <div class="glass reference-table-card">
+                                <h4>Biomarker Comparisons</h4>
+                                <div class="reference-items" id="reference-comparison-list">
+                                    <!-- Dynamic contents -->
+                                </div>
+                            </div>
+
+                            <!-- Print / PDF Action buttons -->
+                            <div class="results-actions">
+                                <button class="action-btn secondary-btn" id="btn-print-report">
+                                    <i class="fa-solid fa-print"></i> Print Patient Report
+                                </button>
+                                <button class="action-btn accent-btn" id="btn-reset-form">
+                                    <i class="fa-solid fa-rotate-left"></i> Reset Parameters
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: BULK SCREENING -->
+            <section id="bulk-test-tab" class="tab-content">
+                <div class="bulk-layout">
+                    <!-- File upload panel -->
+                    <div class="bulk-upload-card glass">
+                        <div class="col-header">
+                            <h3><i class="fa-solid fa-file-excel"></i> Batch Diagnostic Screening</h3>
+                            <p>Upload a CSV file containing patient hematological metrics to analyze multiple profiles simultaneously.</p>
+                        </div>
+                        
+                        <div class="dropzone-area" id="csv-dropzone">
+                            <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
+                            <p class="dropzone-main-text">Drag & drop your patient CSV here, or <span>browse files</span></p>
+                            <p class="dropzone-sub-text">Supported formats: CSV only. Columns must include: Age, Gender, Hemoglobin, RBC_Count, Hematocrit, MCV, MCH, MCHC.</p>
+                            <input type="file" id="bulk-csv-input" accept=".csv" class="hidden">
+                        </div>
+
+                        <div class="bulk-actions-row">
+                            <a href="#" class="action-link" id="btn-download-template">
+                                <i class="fa-solid fa-download"></i> Download Anemia CSV Template
+                            </a>
+                            <button class="action-btn primary-btn hidden" id="btn-process-bulk">
+                                <i class="fa-solid fa-circle-play"></i> Process Batch Diagnostics
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bulk Results Panel (Initially Hidden) -->
+                    <div class="bulk-results-card glass hidden" id="bulk-results-section">
+                        <div class="panel-header-with-actions">
+                            <div>
+                                <h3><i class="fa-solid fa-square-poll-vertical"></i> Batch Summary</h3>
+                                <p>Statistics and analysis generated for <span id="bulk-summary-count">-</span> patient records.</p>
+                            </div>
+                            <button class="action-btn secondary-btn" id="btn-export-bulk-csv">
+                                <i class="fa-solid fa-file-export"></i> Export Screened List
+                            </button>
+                        </div>
+
+                        <!-- Bulk Stats Summary Mini Grid -->
+                        <div class="bulk-stats-grid">
+                            <div class="bulk-stat-item">
+                                <span class="label">Overall Anemia Rate</span>
+                                <span class="value" id="bulk-anemia-rate">-%</span>
+                            </div>
+                            <div class="bulk-stat-item">
+                                <span class="label">Microcytic Cases</span>
+                                <span class="value" id="bulk-micro-count">-</span>
+                            </div>
+                            <div class="bulk-stat-item">
+                                <span class="label">Macrocytic Cases</span>
+                                <span class="value" id="bulk-macro-count">-</span>
+                            </div>
+                            <div class="bulk-stat-item">
+                                <span class="label">Normocytic Cases</span>
+                                <span class="value" id="bulk-norm-count">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Table -->
+                        <div class="table-container bulk-table-container">
+                            <table class="clinical-table bulk-table" id="bulk-results-table">
+                                <thead>
+                                    <tr>
+                                        <th>Patient ID</th>
+                                        <th>Demographics</th>
+                                        <th>Hemoglobin</th>
+                                        <th>MCV</th>
+                                        <th>Diagnosis</th>
+                                        <th>Risk Level</th>
+                                        <th>ML Prob</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bulk-table-body">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: CLINICAL GUIDE -->
+            <section id="reference-tab" class="tab-content">
+                <div class="reference-layout glass">
+                    <div class="col-header">
+                        <h2><i class="fa-solid fa-book-medical"></i> Medical Reference & Anemia Classifications</h2>
+                        <p>A clinician's guide to red blood cell indexes and morphologic classifications of anemia.</p>
+                    </div>
+
+                    <div class="ref-sections">
+                        <div class="ref-block">
+                            <h3>1. Understanding Red Blood Cell Indices</h3>
+                            <p>Complete Blood Counts (CBC) provide diagnostic indices crucial for classifying anemia and identifying its primary etiology.</p>
+                            
+                            <div class="ref-cards-grid">
+                                <div class="ref-card">
+                                    <h4>Hemoglobin (Hb)</h4>
+                                    <p>The oxygen-transporting protein in RBCs. It serves as the primary diagnostic threshold for anemia.</p>
+                                    <ul>
+                                        <li><strong>Normal Male:</strong> 13.5 – 17.5 g/dL</li>
+                                        <li><strong>Normal Female:</strong> 12.0 – 15.5 g/dL</li>
+                                    </ul>
+                                </div>
+                                <div class="ref-card">
+                                    <h4>Mean Corpuscular Volume (MCV)</h4>
+                                    <p>The average volume (size) of red blood cells. Categorizes anemia into microcytic, normocytic, or macrocytic.</p>
+                                    <ul>
+                                        <li><strong>Microcytic:</strong> &lt; 80 fL</li>
+                                        <li><strong>Normocytic:</strong> 80 – 100 fL</li>
+                                        <li><strong>Macrocytic:</strong> &gt; 100 fL</li>
+                                    </ul>
+                                </div>
+                                <div class="ref-card">
+                                    <h4>Mean Corpuscular Hemoglobin (MCH)</h4>
+                                    <p>The average mass of hemoglobin per red blood cell. Closely tracks MCV.</p>
+                                    <ul>
+                                        <li><strong>Normal Range:</strong> 27 – 33 pg</li>
+                                        <li><strong>Low (Hypochromic):</strong> &lt; 27 pg</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ref-block">
+                            <h3>2. Morphologic Classifications of Anemia</h3>
+                            <div class="morph-classification-list">
+                                <div class="morph-item">
+                                    <div class="morph-header">
+                                        <span class="morph-tag micro">Microcytic Hypochromic Anemia</span>
+                                        <strong>MCV &lt; 80 fL | MCH &lt; 27 pg</strong>
+                                    </div>
+                                    <p>Characterized by small, pale red blood cells. This state indicates a defect in hemoglobin synthesis.</p>
+                                    <ul>
+                                        <li><strong>Primary Causes:</strong> Iron Deficiency Anemia (most common), Thalassemia, Sideroblastic Anemia, Lead Poisoning.</li>
+                                        <li><strong>Recommended Workup:</strong> Serum Ferritin, Iron, Total Iron Binding Capacity (TIBC), Transferrin Saturation.</li>
+                                    </ul>
+                                </div>
+
+                                <div class="morph-item">
+                                    <div class="morph-header">
+                                        <span class="morph-tag macro">Macrocytic Anemia</span>
+                                        <strong>MCV &gt; 100 fL</strong>
+                                    </div>
+                                    <p>Characterized by abnormally large red blood cells. Divided into Megaloblastic (impaired DNA synthesis) and Non-Megaloblastic.</p>
+                                    <ul>
+                                        <li><strong>Primary Causes:</strong> Vitamin B12 Deficiency (Pernicious Anemia), Folate Deficiency, Alcoholism, Liver Disease, Drug-induced.</li>
+                                        <li><strong>Recommended Workup:</strong> Serum B12, Serum/RBC Folate, Methylmalonic Acid (MMA) levels.</li>
+                                    </ul>
+                                </div>
+
+                                <div class="morph-item">
+                                    <div class="morph-header">
+                                        <span class="morph-tag normo">Normocytic Normochromic Anemia</span>
+                                        <strong>MCV 80 - 100 fL | MCH 27 - 33 pg</strong>
+                                    </div>
+                                    <p>Red blood cells are normal in size and hemoglobin concentration, but overall count is depleted.</p>
+                                    <ul>
+                                        <li><strong>Primary Causes:</strong> Anemia of Chronic Disease (Infection, Inflammation, Malignancy), Acute Blood Loss, Hemolytic Anemia, Chronic Renal Failure.</li>
+                                        <li><strong>Recommended Workup:</strong> Reticulocyte count (to assess bone marrow response), Renal panel (EPO levels), CRP/ESR.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Script -->
+    <script src="app.js"></script>
+</body>
+</html>

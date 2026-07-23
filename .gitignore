@@ -1,0 +1,27 @@
+# Python virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# Python cache / compile files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Large datasets (optional, but good practice if they grow)
+# data/anemia_dataset.csv
